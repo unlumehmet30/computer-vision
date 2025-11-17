@@ -1,1 +1,13 @@
 .idea
+.DS_Store
+node_modules
+dist
+.env
+.vscode
+coverage
+*.log
+*.tmp
+*.bak
+*.swp           
+*.class
+*.jar
