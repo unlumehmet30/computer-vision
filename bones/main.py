@@ -32,7 +32,7 @@ plt.title("kemik yasi distribution")
 plt.tight_layout()
 plt.show()
 
-def load_imqage(df,img_size=128):
+def load_image(df,img_size=128):
     images=[]
     valid_indices=[]
     for i,path in enumerate(df["path"]):
@@ -43,13 +43,13 @@ def load_imqage(df,img_size=128):
         img=img/255.
         images.append(img)
         valid_indices.append(i)
-    new_df=df.iloc(valid_indices).reset_index(drop=True)
+    new_df=df.iloc[valid_indices].reset_index(drop=True)
     return np.array(images).reshape(-1,img_size,img_size),new_df["boneage"].values
-X,y=load_imqage(df)
+X,y=load_image(df)
 print(X.shape)
-x_train,x_val,y_train,y_val=train_test_split(x,y,test_size=.2,random_state=42)
+x_train,x_val,y_train,y_val=train_test_split(X,y,test_size=.2,random_state=42)
 datagen=ImageDataGenerator(
-    horizontal_lip=True,
+    horizontal_flip=True,
     zoom_range=.3,
     width_shift_range=0.1,
     height_shift_range=.2
@@ -58,7 +58,7 @@ datagen=ImageDataGenerator(
 datagen.fit(x_train)
 #cnn
 model=Sequential()
-model.add(Conv2D(32,(3,3),activation="relu",input_shape=(128,128,)))
+model.add(Conv2D(32,(3,3),activation="relu",input_shape=(128,128,1)))
 model.add(MaxPooling2D(2,2))
 model.add(Conv2D(64,(3,3),activation="relu"))
 model.add(MaxPooling2D(2,2))
@@ -72,15 +72,15 @@ model.add(Dense(1,activation="linear"))
 
 #compile
 model.compile(
-    optimizers=Adam(lr=1e-4),
+    optimizer=Adam(learning_rate=1e-4),
     loss="mae",
     metrics=[MeanAbsoluteError()]
 
 
 )
 callbacks=[
-    EarlyStopping(patience=10,restore_best_weights=True,monitor="vall_loss"),
-    ModelCheckpoint("bone_age_model.keras",save_best_only=True,monitor="vall_loss"),
+    EarlyStopping(patience=10,restore_best_weights=True,monitor="val_loss"),
+    ModelCheckpoint("bone_age_model.keras",save_best_only=True,monitor="val_loss"),
     ReduceLROnPlateau(patience=5,factor=0.5,monitor="val_loss")
     
 ]
@@ -109,7 +109,7 @@ for i in range(10):
     plt.subplot(2,5,i+1)
     plt.imshow(x_val[i].reshape(128,128),cmap="gray")
     plt.title(f"tahmin:{preds[i][0]:.0f}\ngercek:{actuals[i][0]:.0f}")
-    plt.axis("of")
+    plt.axis("off")
 plt.title("bone age results")
 plt.tight_layout()
 plt.show()

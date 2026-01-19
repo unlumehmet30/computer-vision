@@ -32,7 +32,7 @@ stage = None
 def posture_classification(angle):
     if angle <100:
         return "squat"
-    elif 100<=angle>=160:
+    elif 100 <= angle <= 160:
         return "stand"
     else:
         return "standing"
