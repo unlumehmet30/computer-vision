@@ -11,3 +11,5 @@ coverage
 *.swp           
 *.class
 *.jar
+__pycache__
+*.pyc
